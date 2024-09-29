@@ -1,0 +1,25 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environments
+venv/
+
+# Ignore environment variables
+.env
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore PyTorch models
+*.pt
+*.pth
+
+# Ignore logs and temp files
+*.log
+*.tmp
+logs/
+
+# Ignore IDE configuration files
+.vscode/
+.idea/
