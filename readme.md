@@ -19,3 +19,30 @@ TradeBot is an algorithmic trading bot using Alpaca API and Lumibot for backtest
 1. Create a virtual environment:
    ```bash
    python -m venv venv
+Activate the virtual environment:
+
+bash
+Copy code
+# On Windows
+venv\Scripts\activate
+
+# On Mac/Linux
+source venv/bin/activate
+Install dependencies:
+
+bash
+Copy code
+pip install -r requirements.txt
+Create a .env file with your Alpaca API credentials:
+
+bash
+Copy code
+ALPACA_API_KEY=your_api_key
+ALPACA_API_SECRET=your_api_secret
+ALPACA_PAPER=True
+ALPACA_BASE_URL=https://paper-api.alpaca.markets
+Usage
+Run the backtest:
+bash
+Copy code
+python tradebot.py
