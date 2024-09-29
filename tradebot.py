@@ -113,49 +113,62 @@ class PortfolioTrader(Strategy):
                     continue
 
                 logging.info(f"Checking trading conditions for {symbol} - Cash: {cash}, Last Price: {last_price}, Quantity: {quantity}")
+                logging.info(f"Position sizing for {symbol} - Quantity: {quantity}, Portfolio Weight: {portfolio_weights.get(symbol, 0)}")
 
+                # Check if cash is available for the trade
                 if cash > last_price:
                     probability, sentiment = self.get_sentiment(symbol)
                     logging.info(f"Sentiment for {symbol}: Probability={probability}, Sentiment={sentiment}")
-                    if sentiment == "positive" and probability > 0.50:
-                        print("Good news for", symbol, " probability:", probability)
-                    if sentiment == "negative" and probability > 0.50:
-                        print("Bad news for", symbol, " probability:", probability)
 
+                    # Positive sentiment - Buy
                     if sentiment == "positive" and probability > 0.80:
                         logging.info(f"Buying {symbol} with quantity {quantity}")
+
+                        # Only sell previous positions if they exist
                         if self.last_trades[symbol] == "sell":
                             self.sell_all(symbol)
+
                         adjusted_quantity = round(quantity * portfolio_weights.get(symbol, 0))
                         if adjusted_quantity > 0:
+                            logging.info(f"Placing buy order for {symbol} - Adjusted Quantity: {adjusted_quantity}")
                             order = self.create_order(
                                 symbol,
                                 adjusted_quantity,
                                 "buy",
-                                type="market",
+                                order_type="market",
                                 time_in_force="day"
                             )
                             self.submit_order(order)
                             self.last_trades[symbol] = "buy"
-                    
+                        else:
+                            logging.warning(f"Adjusted quantity for {symbol} is zero. No buy order placed.")
+
+                    # Negative sentiment - Sell
                     elif sentiment == "negative" and probability > 0.80:
                         logging.info(f"Selling {symbol}")
+
+                        # Only sell if there's a previous buy trade
                         if self.last_trades[symbol] == "buy":
                             self.sell_all(symbol)
+
                         adjusted_quantity = round(quantity * portfolio_weights.get(symbol, 0))
                         if adjusted_quantity > 0:
+                            logging.info(f"Placing sell order for {symbol} - Adjusted Quantity: {adjusted_quantity}")
                             order = self.create_order(
                                 symbol,
                                 adjusted_quantity,
                                 "sell",
-                                type="market",
+                                order_type="market",
                                 time_in_force="day"
                             )
                             self.submit_order(order)
                             self.last_trades[symbol] = "sell"
+                        else:
+                            logging.warning(f"Adjusted quantity for {symbol} is zero. No sell order placed.")
 
         except Exception as e:
             logging.error(f"Error during trading iteration: {e}")
+
 
     def sell_all(self, symbol):
         """Sell all shares of a specific symbol."""
